@@ -37,24 +37,25 @@ FULL OUTER JOIN bookings b
 
 -- MySQL Alternative for FULL OUTER JOIN (using UNION of LEFT and RIGHT joins)
 -- Uncomment if using MySQL:
--- SELECT 
---     u.id AS user_id,
---     u.name AS user_name,
---     b.id AS booking_id,
---     b.property_id,
---     b.start_date,
---     b.end_date
--- FROM users u
--- LEFT JOIN bookings b
---     ON u.id = b.user_id
--- UNION
--- SELECT 
---     u.id AS user_id,
---     u.name AS user_name,
---     b.id AS booking_id,
---     b.property_id,
---     b.start_date,
---     b.end_date
--- FROM users u
--- RIGHT JOIN bookings b
---     ON u.id = b.user_id;
+SELECT 
+    u.id AS user_id,
+    u.name AS user_name,
+    b.id AS booking_id,
+    b.property_id,
+    b.start_date,
+    b.end_date
+FROM users u
+LEFT JOIN bookings b
+    ON u.id = b.user_id
+UNION
+SELECT 
+    u.id AS user_id,
+    u.name AS user_name,
+    b.id AS booking_id,
+    b.property_id,
+    b.start_date,
+    b.end_date
+FROM users u
+RIGHT JOIN bookings b
+    ON u.id = b.user_id;
+    
