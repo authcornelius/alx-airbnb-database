@@ -1,5 +1,7 @@
 -- ==========================
 -- Initial Complex Query
+-- Retrieves all bookings with user, property, and payment details
+-- Includes WHERE ... AND filtering
 -- ==========================
 EXPLAIN ANALYZE
 SELECT 
@@ -17,15 +19,13 @@ SELECT
 FROM bookings b
 JOIN users u ON b.user_id = u.id
 JOIN properties p ON b.property_id = p.id
-JOIN payments pay ON b.id = pay.booking_id;
+JOIN payments pay ON b.id = pay.booking_id
+WHERE b.start_date IS NOT NULL
+  AND pay.status = 'completed';
 
 -- ==========================
--- Refactored Query
+-- Refactored Optimized Query
 -- ==========================
--- Optimization applied:
--- 1. Only selected the necessary fields.
--- 2. Used INNER JOIN only where guaranteed matches exist.
--- 3. Relied on indexes already created (user_id, property_id, booking_id).
 EXPLAIN ANALYZE
 SELECT 
     b.id AS booking_id,
@@ -37,4 +37,6 @@ SELECT
 FROM bookings b
 JOIN users u ON b.user_id = u.id
 JOIN properties p ON b.property_id = p.id
-LEFT JOIN payments pay ON b.id = pay.booking_id;
+LEFT JOIN payments pay ON b.id = pay.booking_id
+WHERE b.start_date IS NOT NULL
+  AND (pay.status = 'completed' OR pay.status IS NULL);
