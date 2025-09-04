@@ -1,63 +1,42 @@
--- 1. INNER JOIN: Retrieve all bookings and the respective users who made those bookings
+-- ==========================
+-- Initial Complex Query
+-- Retrieves all bookings with user, property, and payment details
+-- Includes WHERE ... AND filtering
+-- ==========================
+EXPLAIN ANALYZE
 SELECT 
     b.id AS booking_id,
-    b.property_id,
     b.start_date,
     b.end_date,
     u.id AS user_id,
     u.name AS user_name,
-    u.email AS user_email
-FROM bookings b
-INNER JOIN users u
-    ON b.user_id = u.id;
-
--- 2. LEFT JOIN: Retrieve all properties and their reviews, including properties with no reviews
-SELECT 
+    u.email AS user_email,
     p.id AS property_id,
     p.name AS property_name,
-    r.id AS review_id,
-    r.rating AS review_rating,
-    r.comment AS review_comment
-FROM properties p
-LEFT JOIN reviews r
-    ON p.id = r.property_id
-ORDER BY p.id;
+    pay.id AS payment_id,
+    pay.amount,
+    pay.status
+FROM bookings b
+JOIN users u ON b.user_id = u.id
+JOIN properties p ON b.property_id = p.id
+JOIN payments pay ON b.id = pay.booking_id
+WHERE b.start_date IS NOT NULL
+  AND pay.status = 'completed';
 
-
--- 3. FULL OUTER JOIN: Retrieve all users and all bookings
--- Note: FULL OUTER JOIN is not supported in MySQL. 
--- If using PostgreSQL, use the query below:
+-- ==========================
+-- Refactored Optimized Query
+-- ==========================
+EXPLAIN ANALYZE
 SELECT 
-    u.id AS user_id,
-    u.name AS user_name,
     b.id AS booking_id,
-    b.property_id,
     b.start_date,
-    b.end_date
-FROM users u
-FULL OUTER JOIN bookings b
-    ON u.id = b.user_id;
-
--- MySQL Alternative for FULL OUTER JOIN (using UNION of LEFT and RIGHT JOINs)
--- Uncomment this if using MySQL:
--- SELECT 
---     u.id AS user_id,
---     u.name AS user_name,
---     b.id AS booking_id,
---     b.property_id,
---     b.start_date,
---     b.end_date
--- FROM users u
--- LEFT JOIN bookings b
---     ON u.id = b.user_id
--- UNION
--- SELECT 
---     u.id AS user_id,
---     u.name AS user_name,
---     b.id AS booking_id,
---     b.property_id,
---     b.start_date,
---     b.end_date
--- FROM users u
--- RIGHT JOIN bookings b
---     ON u.id = b.user_id;
+    b.end_date,
+    u.name AS user_name,
+    p.name AS property_name,
+    pay.amount
+FROM bookings b
+JOIN users u ON b.user_id = u.id
+JOIN properties p ON b.property_id = p.id
+LEFT JOIN payments pay ON b.id = pay.booking_id
+WHERE b.start_date IS NOT NULL
+  AND (pay.status = 'completed' OR pay.status IS NULL);
