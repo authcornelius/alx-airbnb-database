@@ -1,15 +1,32 @@
--- Create index on Users table (frequently used in JOINs and WHERE clauses)
-CREATE INDEX idx_users_id ON users(id);
-CREATE INDEX idx_users_email ON users(email);
+# Index Performance Analysis
 
--- Create index on Bookings table
-CREATE INDEX idx_bookings_user_id ON bookings(user_id);
-CREATE INDEX idx_bookings_property_id ON bookings(property_id);
-CREATE INDEX idx_bookings_start_date ON bookings(start_date);
+## Introduction
+Indexes help optimize queries by reducing full table scans on frequently used columns.  
+We identified columns in Users, Bookings, Properties, and Reviews that are often used in `WHERE`, `JOIN`, and `ORDER BY` clauses.
 
--- Create index on Properties table
-CREATE INDEX idx_properties_id ON properties(id);
-CREATE INDEX idx_properties_name ON properties(name);
+## Indexes Implemented
+- **Users**
+  - `idx_users_id` → Improves joins on `users.id`
+  - `idx_users_email` → Optimizes lookups by email
 
--- Create index on Reviews table (useful for filtering by property)
-CREATE INDEX idx_reviews_property_id ON reviews(property_id);
+- **Bookings**
+  - `idx_bookings_user_id` → Faster joins with users
+  - `idx_bookings_property_id` → Faster joins with properties
+  - `idx_bookings_start_date` → Optimizes date range queries
+
+- **Properties**
+  - `idx_properties_id` → Speeds up joins with bookings
+  - `idx_properties_name` → Improves search by name
+
+- **Reviews**
+  - `idx_reviews_property_id` → Optimizes review lookups by property
+
+## Performance Measurement
+
+### Example 1: Users and Bookings Join
+```sql
+EXPLAIN ANALYZE
+SELECT u.name, b.start_date, b.end_date
+FROM users u
+JOIN bookings b ON u.id = b.user_id
+WHERE b.start_date > '2025-01-01';
