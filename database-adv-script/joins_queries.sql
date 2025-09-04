@@ -20,7 +20,9 @@ SELECT
     r.comment AS review_comment
 FROM properties p
 LEFT JOIN reviews r
-    ON p.id = r.property_id;
+    ON p.id = r.property_id
+ORDER BY p.id;
+
 
 -- 3. FULL OUTER JOIN: Retrieve all users and all bookings
 -- Note: FULL OUTER JOIN is not supported in MySQL. 
